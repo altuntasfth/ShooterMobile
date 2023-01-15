@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -12,6 +13,11 @@ public class VariableJoystick : Joystick
 
     private Vector2 fixedPosition = Vector2.zero;
 
+    public bool isOnClick;
+
+    public event Action PointerDown;
+    public event Action PointerUp;
+
     public void SetMode(JoystickType joystickType)
     {
         this.joystickType = joystickType;
@@ -21,7 +27,10 @@ public class VariableJoystick : Joystick
             background.gameObject.SetActive(true);
         }
         else
-            background.gameObject.SetActive(false);
+        {
+            //background.gameObject.SetActive(false);
+        }
+            
     }
 
     protected override void Start()
@@ -36,15 +45,25 @@ public class VariableJoystick : Joystick
         if(joystickType != JoystickType.Fixed)
         {
             background.anchoredPosition = ScreenPointToAnchoredPosition(eventData.position);
-            background.gameObject.SetActive(true);
+            //background.gameObject.SetActive(true);
         }
+
+        isOnClick = true;
+        PointerDown?.Invoke();
+        
         base.OnPointerDown(eventData);
     }
 
     public override void OnPointerUp(PointerEventData eventData)
     {
-        if(joystickType != JoystickType.Fixed)
-            background.gameObject.SetActive(false);
+        if (joystickType != JoystickType.Fixed)
+        {
+            //background.gameObject.SetActive(false);
+            background.anchoredPosition = fixedPosition;
+        }
+
+        isOnClick = false;
+        PointerUp?.Invoke();
 
         base.OnPointerUp(eventData);
     }
