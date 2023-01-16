@@ -7,6 +7,7 @@ namespace _Game.Scripts
     {
         [SerializeField] protected GameManager gameManager;
         [SerializeField] protected Transform shootPoint;
+        [SerializeField] protected Animator animator;
         [SerializeField] protected float movementSpeed = 10f;
         [SerializeField] protected float rotationSpeed = 10f;
 

@@ -1,5 +1,6 @@
 using System;
 using _Game.Scripts.Pool;
+using _Game.Scripts.Utilities;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -8,6 +9,8 @@ namespace _Game.Scripts
 {
     public class PlayerMechanic : BaseCharacter
     {
+        private float angleBetweenLocalForwardAndMoveVector;
+        
         private void OnEnable()
         {
             InputManager.Instance.PointerDown += HandleOnPointerDown;
@@ -15,6 +18,8 @@ namespace _Game.Scripts
             InputManager.Instance.PointerEnd += HandleOnPointerEnd;
 
             gameManager.shootJoystick.PointerUp += Shoot;
+            gameManager.movementJoystick.PointerUp += MoveUp;
+            gameManager.movementJoystick.PointerDown += MoveDown;
         }
 
         private void OnDisable()
@@ -24,6 +29,8 @@ namespace _Game.Scripts
             InputManager.Instance.PointerEnd -= HandleOnPointerEnd;
             
             gameManager.shootJoystick.PointerUp -= Shoot;
+            gameManager.movementJoystick.PointerUp -= MoveUp;
+            gameManager.movementJoystick.PointerDown -= MoveDown;
         }
 
         protected override void Awake()
@@ -51,7 +58,22 @@ namespace _Game.Scripts
 
         private void Move()
         {
-            transform.position += SkillDirection(gameManager.movementJoystick) * movementSpeed * Time.deltaTime;
+            Vector2 moveVector = GetMoveVector();
+            Vector2 animatorMove = moveVector;
+            
+            float angleBetweenLocalForwardAndMoveVector = Angle360(Vector2.up, GetAimVector());
+            animatorMove = animatorMove.Rotate(-angleBetweenLocalForwardAndMoveVector);
+            
+            animator.SetFloat(Animator.StringToHash("MoveX"), 
+                Mathf.Lerp(animator.GetFloat(Animator.StringToHash("MoveX")), 
+                    animatorMove.x, Time.deltaTime * 5f));
+            
+            animator.SetFloat(Animator.StringToHash("MoveY"), 
+                Mathf.Lerp(animator.GetFloat(Animator.StringToHash("MoveY")),
+                    animatorMove.y, Time.deltaTime * 5f));
+
+            Vector3 moveInputVector = SkillDirection(gameManager.movementJoystick);
+            transform.position += moveInputVector * movementSpeed * Time.deltaTime;
         }
 
         private void Rotate(Vector3 direction)
@@ -68,6 +90,10 @@ namespace _Game.Scripts
             else if (IsSkillActive(gameManager.dashJoystick))
             {
                 Rotate(SkillDirection(gameManager.dashJoystick));
+            }
+            else if (IsSkillActive(gameManager.bombJoystick))
+            {
+                Rotate(SkillDirection(gameManager.bombJoystick));
             }
             else
             {
@@ -93,11 +119,46 @@ namespace _Game.Scripts
             return skillDirection.normalized;
         }
 
+        private Vector2 GetAimVector()
+        {
+            Vector2 aimVector = Vector2.zero;
+
+            if (IsSkillActive(gameManager.shootJoystick))
+            {
+                aimVector = gameManager.shootJoystick.Horizontal * Vector2.right + 
+                            gameManager.shootJoystick.Vertical * Vector2.up;
+            }
+            else if (IsSkillActive(gameManager.dashJoystick))
+            {
+                aimVector = gameManager.dashJoystick.Horizontal * Vector2.right + 
+                            gameManager.dashJoystick.Vertical * Vector2.up;
+            }
+            else if (IsSkillActive(gameManager.bombJoystick))
+            {
+                aimVector = gameManager.bombJoystick.Horizontal * Vector2.right + 
+                            gameManager.bombJoystick.Vertical * Vector2.up;
+            }
+            else
+            {
+                aimVector = gameManager.movementJoystick.Horizontal * Vector2.right + 
+                            gameManager.movementJoystick.Vertical * Vector2.up;
+            }
+            
+            aimVector = aimVector.sqrMagnitude < 0.01f ? Vector2.up * 0.01f : aimVector;
+            return aimVector;
+        }
+        
+        public Vector2 GetMoveVector()
+        {
+            return gameManager.movementJoystick.Horizontal * Vector2.right +
+                   gameManager.movementJoystick.Vertical * Vector2.up;
+        }
+
         private void Shoot()
         {
             BulletEntity bullet = PoolManager.Instance.Pool.Get().GetComponent<BulletEntity>();
             bullet.transform.position = shootPoint.position;
-            bullet.transform.forward = SkillDirection(gameManager.shootJoystick);
+            bullet.transform.forward = transform.forward;
 
             DOTween.Kill("Destroy" + bullet.GetInstanceID());
             DOVirtual.DelayedCall(bullet.destroyTime, () =>
@@ -105,6 +166,16 @@ namespace _Game.Scripts
                 bullet.isUsed = false;
                 bullet.Disable.Invoke(bullet);
             }).SetId("Destroy" + bullet.GetInstanceID());
+        }
+
+        private void MoveUp()
+        {
+            animator.CrossFadeInFixedTime("Idle", 0.1f);
+        }
+        
+        private void MoveDown()
+        {
+            animator.CrossFadeInFixedTime("Move", 0.1f);
         }
 
         #region INPUT
@@ -150,5 +221,23 @@ namespace _Game.Scripts
         }
 
         #endregion
+        
+        public static float Angle360(Vector2 p1, Vector2 p2, Vector2 o = default(Vector2))
+        {
+            Vector2 v1, v2;
+            if (o == default(Vector2))
+            {
+                v1 = p1.normalized;
+                v2 = p2.normalized;
+            }
+            else
+            {
+                v1 = (p1 - o).normalized;
+                v2 = (p2 - o).normalized;
+            }
+
+            float angle = Vector2.Angle(v1, v2);
+            return Mathf.Sign(Vector3.Cross(v1, v2).z) < 0 ? (360 - angle) % 360 : angle;
+        }
     }
 }
