@@ -21,6 +21,7 @@ namespace _Game.Scripts
             base.Awake();
 
             currentHealth = initialHealth;
+            currentArmor = initialArmor;
             
             SetupStateMachine();
         }

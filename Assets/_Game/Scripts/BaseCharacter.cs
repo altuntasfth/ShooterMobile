@@ -4,10 +4,12 @@ using _Game.Scripts.AI.EnemyAI;
 using Cinemachine.Utility;
 using DG.Tweening;
 using FSM;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 namespace _Game.Scripts
 {
@@ -19,17 +21,25 @@ namespace _Game.Scripts
             ENEMY
         };
         public AIType aiType;
-        
+
+        public GameObject criticTMPPrefab;
         public Animator animator;
         public Rigidbody rb;
         public int bulletCapacity = 5;
         public int currentBulletCount = 5;
         public bool isAlive;
         public float initialHealth = 100;
+        public float initialArmor = 100;
         public float currentHealth;
+        public float currentArmor;
         public float healthRatio;
+        public float armorRatio;
+
+        public int shotsCount;
+        public int hitShotsCount;
 
         public Image healthBarFillImage;
+        public Image armorBarFillImage;
         public GameManager gameManager;
         public Transform shootPoint;
         [SerializeField] protected float rotationSpeed = 10f;
@@ -49,12 +59,51 @@ namespace _Game.Scripts
             }
             
             healthBarFillImage.fillAmount = Mathf.Lerp(healthBarFillImage.fillAmount, healthRatio, Time.smoothDeltaTime * 5f);
+            armorBarFillImage.fillAmount = Mathf.Lerp(armorBarFillImage.fillAmount, armorRatio, Time.smoothDeltaTime * 5f);
+        }
+
+        public float GetCriticDamage(float damageValue)
+        {
+            if (hitShotsCount != shotsCount)
+            {
+                shotsCount = 0;
+                hitShotsCount = 0;
+            }
+            else
+            {
+                if (hitShotsCount % 3 == 0)
+                {
+                    damageValue *= 2;
+                    TextMeshPro criticTMP = Instantiate(criticTMPPrefab, transform.position + Vector3.up * 3f, Quaternion.identity).
+                        GetComponent<TextMeshPro>();
+                    criticTMP.text = "CRITIC!";
+                    Destroy(criticTMP.gameObject, 2f);
+                }
+            }
+
+            return damageValue;
         }
 
         public void TakeDamage(float damageValue)
         {
-            currentHealth = Mathf.Clamp(currentHealth - damageValue, 0f, float.MaxValue);
+            float armorPenetrationValue = Random.Range(10f, 50f);
+            float damageToHealth = 0f;
+            float damageToArmor = 0f;
+            
+            if (currentArmor > 0f)
+            {
+                damageToHealth = damageValue * armorPenetrationValue / 100f;
+                damageToArmor = damageValue * (100f - armorPenetrationValue) / 100f;
+            }
+            else
+            {
+                damageToHealth = damageValue;
+            }
+            
+            currentHealth = Mathf.Clamp(currentHealth - damageToHealth, 0f, float.MaxValue);
+            currentArmor = Mathf.Clamp(currentArmor - damageToArmor, 0f, float.MaxValue);
             healthRatio = currentHealth / initialHealth;
+            armorRatio = currentArmor / initialArmor;
             
             if (currentHealth <= 0f)
             {
@@ -62,6 +111,7 @@ namespace _Game.Scripts
 
                 isAlive = false;
                 healthBarFillImage.fillAmount = 0f;
+                armorBarFillImage.fillAmount = 0f;
                 gameObject.tag = "Untagged";
                 gameObject.layer = LayerMask.NameToLayer("Default");
                 GetComponent<Collider>().enabled = false;

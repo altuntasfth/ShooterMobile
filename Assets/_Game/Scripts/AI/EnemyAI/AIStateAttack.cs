@@ -56,7 +56,8 @@ namespace _Game.Scripts.AI.EnemyAI
             //if (character.currentBulletCount > 0)
             {
                 BulletEntity bullet = PoolManager.Instance.Pool.Get().GetComponent<BulletEntity>();
-                bullet.aiType = character.aiType;
+                character.shotsCount++;
+                bullet.ownerCharacter = character;
                 bullet.transform.position = character.shootPoint.position;
                 bullet.transform.forward = character.transform.forward;
 

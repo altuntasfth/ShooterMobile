@@ -12,7 +12,7 @@ namespace _Game.Scripts
         public float destroyTime = 2f;
         public float damage = 10f;
 
-        public BaseCharacter.AIType aiType;
+        public BaseCharacter ownerCharacter;
 
         private void Update()
         {
@@ -22,8 +22,12 @@ namespace _Game.Scripts
         private void OnTriggerEnter(Collider other)
         {
             BaseCharacter character = other.gameObject.GetComponent<BaseCharacter>();
-            if (character.isAlive && character.aiType != aiType)
+            if (character.isAlive && character.aiType != ownerCharacter.aiType)
             {
+                ownerCharacter.hitShotsCount++;
+
+                damage = ownerCharacter.GetCriticDamage(damage);
+                
                 character.TakeDamage(damage);
                 DOTween.Kill("Destroy" + this.GetInstanceID());
                 PoolManager.Instance.Pool.Release(this.gameObject);

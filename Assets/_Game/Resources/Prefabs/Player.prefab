@@ -1194,15 +1194,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   aiType: 0
+  criticTMPPrefab: {fileID: 7431908022035030200, guid: 75f9172262f5d45878bbe79e6fa7987e, type: 3}
   animator: {fileID: 4976022491438938848}
   rb: {fileID: 4976022491438938850}
   bulletCapacity: 5
   currentBulletCount: 5
   isAlive: 1
   initialHealth: 100
+  initialArmor: 100
   currentHealth: 0
+  currentArmor: 0
   healthRatio: 1
+  armorRatio: 1
+  shotsCount: 0
+  hitShotsCount: 0
   healthBarFillImage: {fileID: 5562002049055223604}
+  armorBarFillImage: {fileID: 9071616230913948780}
   gameManager: {fileID: 0}
   shootPoint: {fileID: 4976022493231749035}
   rotationSpeed: 20
@@ -2837,3 +2844,14 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2901680028377789697, guid: d6faa58c0fb02436092e7bb45f22a27f, type: 3}
   m_PrefabInstance: {fileID: 4976022492834290639}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &9071616230913948780 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4101293759423506339, guid: d6faa58c0fb02436092e7bb45f22a27f, type: 3}
+  m_PrefabInstance: {fileID: 4976022492834290639}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fceb93b9d8bf04943b1dd4939eaf6284, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

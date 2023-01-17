@@ -52,6 +52,7 @@ namespace _Game.Scripts
             gameManager.cameraTarget.localPosition = Vector3.zero;
 
             currentHealth = playerSettings.initialHealth;
+            currentArmor = playerSettings.initialArmor;
         }
 
         protected override void Update()
@@ -207,7 +208,8 @@ namespace _Game.Scripts
             animator.CrossFadeInFixedTime("Attack", 0.1f);
             
             BulletEntity bullet = PoolManager.Instance.Pool.Get().GetComponent<BulletEntity>();
-            bullet.aiType = AIMechanic.AIType.FRIEND;
+            shotsCount++;
+            bullet.ownerCharacter = this;
             bullet.transform.position = shootPoint.position;
             bullet.transform.forward = transform.forward;
 
