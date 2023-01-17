@@ -93,12 +93,13 @@ MonoBehaviour:
   handleRange: 1
   deadZone: 0
   axisOptions: 0
-  snapX: 1
-  snapY: 1
+  snapX: 0
+  snapY: 0
   background: {fileID: 3881087803815115471}
   handle: {fileID: 3881087804030458062}
   moveThreshold: 1
   joystickType: 1
+  isOnClick: 0
 --- !u!1 &3881087803815115468
 GameObject:
   m_ObjectHideFlags: 0

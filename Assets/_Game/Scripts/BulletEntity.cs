@@ -9,6 +9,7 @@ namespace _Game.Scripts
     {
         public float speed = 10f;
         public float destroyTime = 2f;
+        public float damage = 10f;
         public bool isUsed;
 
         private void Update()

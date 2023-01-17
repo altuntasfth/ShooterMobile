@@ -1,8 +1,10 @@
+using System;
 using _Game.Scripts.Pool;
 using _Game.Scripts.SO;
 using _Game.Scripts.Utilities;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.EventSystems;
 
 namespace _Game.Scripts
@@ -10,6 +12,7 @@ namespace _Game.Scripts
     public class PlayerMechanic : BaseCharacter
     {
         public PlayerSettings playerSettings;
+        public bool isAttackState;
 
         private void OnEnable()
         {
@@ -48,11 +51,26 @@ namespace _Game.Scripts
 
         private void Update()
         {
-            Rotation();
-            
-            if (IsSkillActive(gameManager.movementJoystick))
+            if (gameManager == null || !isAlive || isAttackState)
             {
-                Move();
+                return;
+            }
+
+            Vector3 targetDirection = transform.position + SkillDirection(gameManager.movementJoystick) * 5;
+            NavMeshHit navMeshHit;
+            bool isWalkable = NavMesh.SamplePosition(targetDirection, out navMeshHit, 4, NavMesh.AllAreas);
+
+            if (isWalkable)
+            {
+                Rotation();
+                if (IsSkillActive(gameManager.movementJoystick))
+                {
+                    Move();
+                }
+            }
+            else
+            {
+                throw new Exception(name + ": " + targetDirection + " is non-walkable point!");
             }
         }
 
@@ -156,16 +174,26 @@ namespace _Game.Scripts
 
         private void PlayMoveAnimation()
         {
-            animator.CrossFadeInFixedTime("Move", 0.1f);
+            if (!isAttackState && IsSkillActive(gameManager.movementJoystick))
+            {
+                animator.CrossFadeInFixedTime("Move", 0.1f);
+            }
         }
         
         private void PlayIdleAnimation()
         {
-            animator.CrossFadeInFixedTime("Idle", 0.1f);
+            rb.velocity = Vector3.zero;
+            if (!isAttackState && !IsSkillActive(gameManager.movementJoystick))
+            {
+                animator.CrossFadeInFixedTime("Idle", 0.1f);
+            }
         }
 
         private void Shoot()
         {
+            isAttackState = true;
+            animator.CrossFadeInFixedTime("Attack", 0.1f);
+            
             BulletEntity bullet = PoolManager.Instance.Pool.Get().GetComponent<BulletEntity>();
             bullet.transform.position = shootPoint.position;
             bullet.transform.forward = transform.forward;
@@ -176,6 +204,11 @@ namespace _Game.Scripts
                 bullet.isUsed = false;
                 bullet.Disable.Invoke(bullet);
             }).SetId("Destroy" + bullet.GetInstanceID());
+
+            DOVirtual.DelayedCall(1f, () =>
+            {
+                isAttackState = false;
+            });
         }
         
         private float Angle360(Vector2 p1, Vector2 p2, Vector2 o = default(Vector2))

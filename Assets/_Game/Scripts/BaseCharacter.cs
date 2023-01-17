@@ -1,14 +1,21 @@
 using System;
+using System.Collections.Generic;
+using _Game.Scripts.AI.EnemyAI;
+using Cinemachine.Utility;
+using FSM;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace _Game.Scripts
 {
     public class BaseCharacter : MonoBehaviour
     {
-        [SerializeField] protected GameManager gameManager;
-        [SerializeField] protected Transform shootPoint;
-        [SerializeField] protected Animator animator;
-        [SerializeField] protected float movementSpeed = 10f;
+        public Animator animator;
+        public Rigidbody rb;
+        public bool isAlive;
+
+        public GameManager gameManager;
+        public Transform shootPoint;
         [SerializeField] protected float rotationSpeed = 10f;
 
         protected virtual void Awake()
