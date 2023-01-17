@@ -911,7 +911,13 @@ PlayerSettings:
   windowsGamepadBackendHint: 0
   cloudProjectId: 3edc8976-5cf3-4d0a-9f40-91968daa34ff
   framebufferDepthMemorylessMode: 0
-  qualitySettingsNames: []
+  qualitySettingsNames:
+  - Very Low
+  - Low
+  - Medium
+  - High
+  - Very High
+  - Ultra
   projectName: ShooterMobile (1)
   organizationId: fatihaltuntas44
   cloudEnabled: 0

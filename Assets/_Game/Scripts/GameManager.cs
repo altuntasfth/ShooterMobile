@@ -20,8 +20,6 @@ namespace _Game.Scripts
         private void Awake()
         {
             isGameStarted = true;
-
-            Debug.Log(true);
         }
     }
 }

@@ -1,5 +1,5 @@
-using System;
 using _Game.Scripts.Pool;
+using _Game.Scripts.SO;
 using _Game.Scripts.Utilities;
 using DG.Tweening;
 using UnityEngine;
@@ -9,8 +9,8 @@ namespace _Game.Scripts
 {
     public class PlayerMechanic : BaseCharacter
     {
-        private float angleBetweenLocalForwardAndMoveVector;
-        
+        public PlayerSettings playerSettings;
+
         private void OnEnable()
         {
             InputManager.Instance.PointerDown += HandleOnPointerDown;
@@ -18,8 +18,8 @@ namespace _Game.Scripts
             InputManager.Instance.PointerEnd += HandleOnPointerEnd;
 
             gameManager.shootJoystick.PointerUp += Shoot;
-            gameManager.movementJoystick.PointerUp += MoveUp;
-            gameManager.movementJoystick.PointerDown += MoveDown;
+            gameManager.movementJoystick.PointerDown += PlayMoveAnimation;
+            gameManager.movementJoystick.PointerUp += PlayIdleAnimation;
         }
 
         private void OnDisable()
@@ -29,8 +29,8 @@ namespace _Game.Scripts
             InputManager.Instance.PointerEnd -= HandleOnPointerEnd;
             
             gameManager.shootJoystick.PointerUp -= Shoot;
-            gameManager.movementJoystick.PointerUp -= MoveUp;
-            gameManager.movementJoystick.PointerDown -= MoveDown;
+            gameManager.movementJoystick.PointerDown -= PlayMoveAnimation;
+            gameManager.movementJoystick.PointerUp -= PlayIdleAnimation;
         }
 
         protected override void Awake()
@@ -73,7 +73,7 @@ namespace _Game.Scripts
                     animatorMove.y, Time.deltaTime * 5f));
 
             Vector3 moveInputVector = SkillDirection(gameManager.movementJoystick);
-            transform.position += moveInputVector * movementSpeed * Time.deltaTime;
+            transform.position += moveInputVector * playerSettings.movementSpeed * Time.deltaTime;
         }
 
         private void Rotate(Vector3 direction)
@@ -148,10 +148,20 @@ namespace _Game.Scripts
             return aimVector;
         }
         
-        public Vector2 GetMoveVector()
+        private Vector2 GetMoveVector()
         {
             return gameManager.movementJoystick.Horizontal * Vector2.right +
                    gameManager.movementJoystick.Vertical * Vector2.up;
+        }
+
+        private void PlayMoveAnimation()
+        {
+            animator.CrossFadeInFixedTime("Move", 0.1f);
+        }
+        
+        private void PlayIdleAnimation()
+        {
+            animator.CrossFadeInFixedTime("Idle", 0.1f);
         }
 
         private void Shoot()
@@ -167,15 +177,23 @@ namespace _Game.Scripts
                 bullet.Disable.Invoke(bullet);
             }).SetId("Destroy" + bullet.GetInstanceID());
         }
-
-        private void MoveUp()
-        {
-            animator.CrossFadeInFixedTime("Idle", 0.1f);
-        }
         
-        private void MoveDown()
+        private float Angle360(Vector2 p1, Vector2 p2, Vector2 o = default(Vector2))
         {
-            animator.CrossFadeInFixedTime("Move", 0.1f);
+            Vector2 v1, v2;
+            if (o == default(Vector2))
+            {
+                v1 = p1.normalized;
+                v2 = p2.normalized;
+            }
+            else
+            {
+                v1 = (p1 - o).normalized;
+                v2 = (p2 - o).normalized;
+            }
+
+            float angle = Vector2.Angle(v1, v2);
+            return Mathf.Sign(Vector3.Cross(v1, v2).z) < 0 ? (360 - angle) % 360 : angle;
         }
 
         #region INPUT
@@ -221,23 +239,5 @@ namespace _Game.Scripts
         }
 
         #endregion
-        
-        public static float Angle360(Vector2 p1, Vector2 p2, Vector2 o = default(Vector2))
-        {
-            Vector2 v1, v2;
-            if (o == default(Vector2))
-            {
-                v1 = p1.normalized;
-                v2 = p2.normalized;
-            }
-            else
-            {
-                v1 = (p1 - o).normalized;
-                v2 = (p2 - o).normalized;
-            }
-
-            float angle = Vector2.Angle(v1, v2);
-            return Mathf.Sign(Vector3.Cross(v1, v2).z) < 0 ? (360 - angle) % 360 : angle;
-        }
     }
 }
