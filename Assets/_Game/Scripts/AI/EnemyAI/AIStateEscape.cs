@@ -38,7 +38,13 @@ namespace _Game.Scripts.AI.EnemyAI
 
         private Vector3 GetRandomPosition()
         {
-            Vector3 targetPosition = character.GetComponent<AIMechanic>().GetTargetCharacter().transform.position + 
+            BaseCharacter target = character.GetComponent<AIMechanic>().GetTargetCharacter();
+            if (target == null)
+            {
+                return character.transform.position;
+            }
+            
+            Vector3 targetPosition = target.transform.position + 
                                      Random.insideUnitSphere.normalized * character.GetComponent<AIMechanic>().attackRange;
             
             NavMeshHit navMeshHit;

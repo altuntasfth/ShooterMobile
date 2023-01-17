@@ -10,44 +10,32 @@ namespace _Game.Scripts
 {
     public class AIMechanic : BaseCharacter
     {
-        public enum AIType
-        {
-            FRIEND,
-            ENEMY
-        };
-        public AIType aiType;
         public float attackRange = 8f;
         public NavMeshAgent navMeshAgent;
         public float delayBeforeNextAttack = 0.2f;
 
-        public List<BaseCharacter> targets;
         private StateMachine mainStateMachine;
 
         protected override void Awake()
         {
             base.Awake();
 
-            if (aiType == AIType.FRIEND)
-            {
-                targets = gameManager.enemyTeamMembers;
-            }
-            else
-            {
-                targets = gameManager.playerTeamMembers;
-            }
+            currentHealth = initialHealth;
             
             SetupStateMachine();
         }
 
-        private void Update()
+        protected override void Update()
         {
+            base.Update();
+            
             if (mainStateMachine != null)
             {
                 mainStateMachine.OnLogic();
             }
         }
-        
-        protected virtual void SetupStateMachine()
+
+        private void SetupStateMachine()
         {
             mainStateMachine = new StateMachine(true);
 
@@ -59,21 +47,21 @@ namespace _Game.Scripts
 
             
             mainStateMachine.AddTransition("IdleState", "ChaseState", transition => 
-                targets.Count > 0 && !TargetInAttackRange(transition));
+                GetTargets().Count > 0 && !TargetInAttackRange(transition));
             mainStateMachine.AddTransition("IdleState", "AttackState", transition => 
                 TargetInAttackRange(transition));
 
             mainStateMachine.AddTransition("ChaseState", "IdleState", transition => 
-                targets.Count == 0);
+                GetTargets().Count == 0);
             mainStateMachine.AddTransition("ChaseState", "AttackState", transition => 
                 TargetInAttackRange(transition));
 
             mainStateMachine.AddTransition(new Transition("AttackState", "EscapeState"));
             mainStateMachine.AddTransition("AttackState", "ChaseState", transition => 
-                targets.Count > 0 && !TargetInAttackRange(transition));
+                GetTargets().Count > 0 && !TargetInAttackRange(transition));
             
             mainStateMachine.AddTransition("EscapeState", "IdleState", transition => 
-                targets.Count > 0 && IsCharacterEscaped(transition));
+                GetTargets().Count > 0 && IsCharacterEscaped(transition) || GetTargets().Count == 0);
             
             mainStateMachine.AddTransitionFromAny("Death", transition => !isAlive);
             
@@ -105,6 +93,7 @@ namespace _Game.Scripts
         public BaseCharacter GetTargetCharacter()
         {
             BaseCharacter target = null;
+            List<BaseCharacter> targets = GetTargets();
 
             float minDistance = 99999;
             for (var i = 0; i < targets.Count; i++)
@@ -119,6 +108,21 @@ namespace _Game.Scripts
             }
             
             return target;
+        }
+
+        public List<BaseCharacter> GetTargets()
+        {
+            List<BaseCharacter> targets = new List<BaseCharacter>();
+            if (aiType == AIType.FRIEND)
+            {
+                targets = gameManager.enemyTeamMembers;
+            }
+            else
+            {
+                targets = gameManager.playerTeamMembers;
+            }
+
+            return targets;
         }
     }
 }

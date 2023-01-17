@@ -12,6 +12,7 @@ namespace _Game.Scripts
     public class PlayerMechanic : BaseCharacter
     {
         public PlayerSettings playerSettings;
+        public GameObject attackArea;
         public bool isAttackState;
 
         private void OnEnable()
@@ -20,6 +21,7 @@ namespace _Game.Scripts
             InputManager.Instance.PointerDrag += HandleOnPointerDrag;
             InputManager.Instance.PointerEnd += HandleOnPointerEnd;
 
+            gameManager.shootJoystick.PointerDown += ShootDown;
             gameManager.shootJoystick.PointerUp += Shoot;
             gameManager.movementJoystick.PointerDown += PlayMoveAnimation;
             gameManager.movementJoystick.PointerUp += PlayIdleAnimation;
@@ -31,6 +33,7 @@ namespace _Game.Scripts
             InputManager.Instance.PointerDrag += HandleOnPointerDrag;
             InputManager.Instance.PointerEnd -= HandleOnPointerEnd;
             
+            gameManager.shootJoystick.PointerDown -= ShootDown;
             gameManager.shootJoystick.PointerUp -= Shoot;
             gameManager.movementJoystick.PointerDown -= PlayMoveAnimation;
             gameManager.movementJoystick.PointerUp -= PlayIdleAnimation;
@@ -47,10 +50,14 @@ namespace _Game.Scripts
         {
             gameManager.cameraTarget.parent = this.transform;
             gameManager.cameraTarget.localPosition = Vector3.zero;
+
+            currentHealth = playerSettings.initialHealth;
         }
 
-        private void Update()
+        protected override void Update()
         {
+            base.Update();
+            
             if (gameManager == null || !isAlive || isAttackState)
             {
                 return;
@@ -174,41 +181,60 @@ namespace _Game.Scripts
 
         private void PlayMoveAnimation()
         {
+            animator.CrossFadeInFixedTime("Move", 0.1f);
+            
             if (!isAttackState && IsSkillActive(gameManager.movementJoystick))
             {
-                animator.CrossFadeInFixedTime("Move", 0.1f);
+                
             }
         }
         
         private void PlayIdleAnimation()
         {
             rb.velocity = Vector3.zero;
+            animator.CrossFadeInFixedTime("Idle", 0.1f);
+            
             if (!isAttackState && !IsSkillActive(gameManager.movementJoystick))
             {
-                animator.CrossFadeInFixedTime("Idle", 0.1f);
+                
             }
         }
 
         private void Shoot()
         {
+            attackArea.SetActive(false);
             isAttackState = true;
             animator.CrossFadeInFixedTime("Attack", 0.1f);
             
             BulletEntity bullet = PoolManager.Instance.Pool.Get().GetComponent<BulletEntity>();
+            bullet.aiType = AIMechanic.AIType.FRIEND;
             bullet.transform.position = shootPoint.position;
             bullet.transform.forward = transform.forward;
 
             DOTween.Kill("Destroy" + bullet.GetInstanceID());
             DOVirtual.DelayedCall(bullet.destroyTime, () =>
             {
-                bullet.isUsed = false;
                 bullet.Disable.Invoke(bullet);
             }).SetId("Destroy" + bullet.GetInstanceID());
 
-            DOVirtual.DelayedCall(1f, () =>
+            DOVirtual.DelayedCall(0.5f, () =>
             {
                 isAttackState = false;
+                
+                if (IsSkillActive(gameManager.movementJoystick))
+                {
+                    animator.CrossFadeInFixedTime("Move", 0.1f);
+                }
+                else
+                {
+                    animator.CrossFadeInFixedTime("Idle", 0.1f);
+                }
             });
+        }
+
+        private void ShootDown()
+        {
+            attackArea.SetActive(true);
         }
         
         private float Angle360(Vector2 p1, Vector2 p2, Vector2 o = default(Vector2))

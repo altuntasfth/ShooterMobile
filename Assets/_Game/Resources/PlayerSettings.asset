@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PlayerSettings
   m_EditorClassIdentifier: 
   movementSpeed: 5
-  initialHealth: 10
+  initialHealth: 100
   initialArmor: 100
   initialBulletCapacity: 10
   shootCancelTime: 0.2
