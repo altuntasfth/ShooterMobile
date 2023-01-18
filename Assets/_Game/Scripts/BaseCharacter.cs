@@ -105,7 +105,7 @@ namespace _Game.Scripts
                 }
             }
             
-            Debug.Log(hitShotsCount + " " + shotsCount + " " + damageValue, this);
+            //Debug.Log(hitShotsCount + " " + shotsCount + " " + damageValue, this);
 
             return damageValue;
         }

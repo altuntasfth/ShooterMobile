@@ -126,7 +126,7 @@ namespace _Game.Scripts
             
         }
         
-        private Vector3 GetRandomPosition(Vector3 center)
+        public Vector3 GetRandomPosition(Vector3 center)
         {
             Vector3 targetPosition = center + Random.insideUnitSphere.normalized * 5;
             

@@ -45,24 +45,32 @@ namespace _Game.Scripts
 
             mainStateMachine.AddState("IdleState", new AIStateIdle(this, false));
             mainStateMachine.AddState("ChaseState", new AIStateChase(this, false));
+            mainStateMachine.AddState("ReloadState", new AIStateReload(this, false));
             mainStateMachine.AddState("AttackState", new AIStateAttack(this, true));
             mainStateMachine.AddState("EscapeState", new AIStateEscape(this, false));
             mainStateMachine.AddState("Death", new AIStateDeath(this, true));
 
             
             mainStateMachine.AddTransition("IdleState", "ChaseState", transition => 
-                GetTargets().Count > 0 && !TargetInAttackRange(transition));
+                GetTargets().Count > 0 && currentBulletCount > 0 && !TargetInAttackRange(transition));
             mainStateMachine.AddTransition("IdleState", "AttackState", transition => 
-                TargetInAttackRange(transition));
+                currentBulletCount > 0 && TargetInAttackRange(transition));
+            mainStateMachine.AddTransition("IdleState", "ReloadState", transition => 
+                GetTargets().Count > 0 && currentBulletCount == 0);
+            
+            mainStateMachine.AddTransition("ReloadState", "IdleState", transition => 
+                currentBulletCount > 0);
 
             mainStateMachine.AddTransition("ChaseState", "IdleState", transition => 
                 GetTargets().Count == 0);
             mainStateMachine.AddTransition("ChaseState", "AttackState", transition => 
-                TargetInAttackRange(transition));
+                currentBulletCount > 0 && TargetInAttackRange(transition));
+            mainStateMachine.AddTransition("ChaseState", "ReloadState", transition => 
+                GetTargets().Count > 0 && currentBulletCount == 0);
 
             mainStateMachine.AddTransition(new Transition("AttackState", "EscapeState"));
             mainStateMachine.AddTransition("AttackState", "ChaseState", transition => 
-                GetTargets().Count > 0 && !TargetInAttackRange(transition));
+                GetTargets().Count > 0 && currentBulletCount > 0 && !TargetInAttackRange(transition));
             
             mainStateMachine.AddTransition("EscapeState", "IdleState", transition => 
                 GetTargets().Count > 0 && IsCharacterEscaped(transition) || GetTargets().Count == 0);
@@ -127,6 +135,28 @@ namespace _Game.Scripts
             }
 
             return targets;
+        }
+        
+        public BulletHolder GetNearestBulletHolder()
+        {
+            BulletHolder target = null;
+
+            float minDistance = 99999;
+            for (var i = 0; i < gameManager.bulletHolders.Count; i++)
+            {
+                if (gameManager.bulletHolders[i].currentBulletCount > 0)
+                {
+                    float distance = Vector3.Distance(transform.position.ProjectOntoPlane(Vector3.up), 
+                        gameManager.bulletHolders[i].transform.position.ProjectOntoPlane(Vector3.up));
+                    if (distance < minDistance)
+                    {
+                        minDistance = distance;
+                        target = gameManager.bulletHolders[i];
+                    }
+                }
+            }
+            
+            return target;
         }
     }
 }

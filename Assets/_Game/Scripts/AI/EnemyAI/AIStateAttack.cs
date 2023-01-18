@@ -53,24 +53,19 @@ namespace _Game.Scripts.AI.EnemyAI
 
         private void Attack()
         {
-            //if (character.currentBulletCount > 0)
+            BulletEntity bullet = PoolManager.Instance.Pool.Get().GetComponent<BulletEntity>();
+            character.shotsCount++;
+            character.currentBulletCount--;
+            character.currentBulletCounterTMP.text = "Bullet Capacity: " + character.currentBulletCount;
+            bullet.ownerCharacter = character;
+            bullet.transform.position = character.shootPoint.position;
+            bullet.transform.forward = character.transform.forward;
+
+            DOTween.Kill("Destroy" + bullet.GetInstanceID());
+            DOVirtual.DelayedCall(bullet.destroyTime, () =>
             {
-                BulletEntity bullet = PoolManager.Instance.Pool.Get().GetComponent<BulletEntity>();
-                character.shotsCount++;
-                character.currentBulletCount--;
-                character.currentBulletCounterTMP.text = "Bullet Capacity: " + character.currentBulletCount;
-                bullet.ownerCharacter = character;
-                bullet.transform.position = character.shootPoint.position;
-                bullet.transform.forward = character.transform.forward;
-
-                DOTween.Kill("Destroy" + bullet.GetInstanceID());
-                DOVirtual.DelayedCall(bullet.destroyTime, () =>
-                {
-                    bullet.Disable.Invoke(bullet);
-                }).SetId("Destroy" + bullet.GetInstanceID());
-
-                character.currentBulletCount--;
-            }
+                bullet.Disable.Invoke(bullet);
+            }).SetId("Destroy" + bullet.GetInstanceID());
         }
     }
 }
