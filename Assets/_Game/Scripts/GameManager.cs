@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.AI;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -12,6 +15,7 @@ namespace _Game.Scripts
 {
     public class GameManager : MonoBehaviour
     {
+        [SerializeField] private AssetReferenceGameObject assetReference;
         public Camera mainCamera;
         public Transform cameraTarget;
         public TextMeshProUGUI scoreTMP;
@@ -47,15 +51,33 @@ namespace _Game.Scripts
 
         private void Awake()
         {
-            GenerateEnemyTeamMembers();
-            GeneratePlayerTeamMembers();
+            AsyncOperationHandle<GameObject> asyncOperationHandle = assetReference.LoadAssetAsync<GameObject>();
+            asyncOperationHandle.Completed += AsyncOperationHandleCompleted;
+        }
 
-            playerScore = PlayerPrefs.GetInt("PlayerScore", 0);
-            enemyScore = PlayerPrefs.GetInt("EnemyScore", 0);
+        private void AsyncOperationHandleCompleted(AsyncOperationHandle<GameObject> asyncOperationHandle)
+        {
+            if (asyncOperationHandle.Status == AsyncOperationStatus.Succeeded)
+            {
+                Instantiate(asyncOperationHandle.Result);
+                playerTeamBase = GameObject.Find("PlayerAIBase").transform;
+                enemyTeamBase = GameObject.Find("EnemyAIBase").transform;
+                bulletHolders = FindObjectsOfType<BulletHolder>().ToList();
+                
+                GenerateEnemyTeamMembers();
+                GeneratePlayerTeamMembers();
 
-            scoreTMP.text = "Player: " + playerScore + " | " + enemyScore + " :Enemy";
+                playerScore = PlayerPrefs.GetInt("PlayerScore", 0);
+                enemyScore = PlayerPrefs.GetInt("EnemyScore", 0);
+
+                scoreTMP.text = "Player: " + playerScore + " | " + enemyScore + " :Enemy";
             
-            isGameStarted = true;
+                isGameStarted = true;
+            }
+            else
+            {
+                Debug.Log("Failed to load environment");
+            }
         }
 
         private void GenerateEnemyTeamMembers()

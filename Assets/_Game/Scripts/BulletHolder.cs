@@ -19,20 +19,23 @@ namespace _Game.Scripts
         private void OnTriggerEnter(Collider other)
         {
             BaseCharacter character = other.gameObject.GetComponent<BaseCharacter>();
-            if (character.isAlive && character.currentBulletCount < character.initialBulletCount && currentBulletCount != 0)
+            if (character)
             {
-                character.ReloadBullet(this);
-                
-                bulletCountTMP.text = "Bullet Capacity: " + currentBulletCount;
-
-                if (currentBulletCount == 0)
+                if (character.isAlive && character.currentBulletCount < character.initialBulletCount && currentBulletCount != 0)
                 {
-                    DOTween.Kill("ReloadBullet" + this.GetInstanceID());
-                    DOVirtual.DelayedCall(5f, () =>
+                    character.ReloadBullet(this);
+                
+                    bulletCountTMP.text = "Bullet Capacity: " + currentBulletCount;
+
+                    if (currentBulletCount == 0)
                     {
-                        currentBulletCount = initialBulletCount;
-                        bulletCountTMP.text = "Bullet Capacity: " + currentBulletCount;
-                    }).SetId("ReloadBullet" + this.GetInstanceID());
+                        DOTween.Kill("ReloadBullet" + this.GetInstanceID());
+                        DOVirtual.DelayedCall(5f, () =>
+                        {
+                            currentBulletCount = initialBulletCount;
+                            bulletCountTMP.text = "Bullet Capacity: " + currentBulletCount;
+                        }).SetId("ReloadBullet" + this.GetInstanceID());
+                    }
                 }
             }
         }

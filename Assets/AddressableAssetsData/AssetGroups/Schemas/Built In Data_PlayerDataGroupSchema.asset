@@ -9,12 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30880f4572af49d78f1e3954618f49a5, type: 3}
-  m_Name: PlayerSettings
+  m_Script: {fileID: 11500000, guid: b1487f5d688e4f94f828f879d599dbdc, type: 3}
+  m_Name: Built In Data_PlayerDataGroupSchema
   m_EditorClassIdentifier: 
-  movementSpeed: 5
-  initialHealth: 50
-  initialArmor: 50
-  initialBulletCapacity: 10
-  shootCancelTime: 0.2
-  dashCancelTime: 0.2
+  m_Group: {fileID: 11400000, guid: 5e2f7bba3671447a1ac5b57add995029, type: 2}
+  m_IncludeResourcesFolders: 1
+  m_IncludeBuildSettingsScenes: 1

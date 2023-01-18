@@ -186,6 +186,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   aiType: 0
+  modelEntity: {fileID: 0}
   criticTMPPrefab: {fileID: 7431908022035030200, guid: 75f9172262f5d45878bbe79e6fa7987e, type: 3}
   animator: {fileID: 7377784467240916148}
   rb: {fileID: 0}
@@ -193,8 +194,8 @@ MonoBehaviour:
   initialBulletCount: 5
   currentBulletCount: 5
   isAlive: 1
-  initialHealth: 100
-  initialArmor: 100
+  initialHealth: 50
+  initialArmor: 50
   currentHealth: 0
   currentArmor: 0
   healthRatio: 1
