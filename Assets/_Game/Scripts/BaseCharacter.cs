@@ -22,6 +22,7 @@ namespace _Game.Scripts
         };
         public AIType aiType;
 
+        public CharacterModelEntity modelEntity;
         public GameObject criticTMPPrefab;
         public Animator animator;
         public Rigidbody rb;
@@ -141,7 +142,9 @@ namespace _Game.Scripts
                 gameObject.tag = "Untagged";
                 gameObject.layer = LayerMask.NameToLayer("Default");
                 GetComponent<Collider>().enabled = false;
-                animator.Play("Dead");
+
+                animator.enabled = false;
+                modelEntity.SetActiveRagdoll(true);
 
                 if (onDeathEvent != null)
                 {
