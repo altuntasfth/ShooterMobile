@@ -53,6 +53,8 @@ namespace _Game.Scripts
 
             currentHealth = playerSettings.initialHealth;
             currentArmor = playerSettings.initialArmor;
+            currentBulletCount = initialBulletCount;
+            currentBulletCounterTMP.text = "Bullet Capacity: " + currentBulletCount;
         }
 
         protected override void Update()
@@ -111,7 +113,10 @@ namespace _Game.Scripts
         {
             if (IsSkillActive(gameManager.shootJoystick))
             {
-                Rotate(SkillDirection(gameManager.shootJoystick));
+                if (currentBulletCount > 0)
+                {
+                    Rotate(SkillDirection(gameManager.shootJoystick));
+                }
             }
             else if (IsSkillActive(gameManager.dashJoystick))
             {
@@ -203,12 +208,19 @@ namespace _Game.Scripts
 
         private void Shoot()
         {
+            if (currentBulletCount == 0)
+            {
+                return;
+            }
+            
             attackArea.SetActive(false);
             isAttackState = true;
             animator.CrossFadeInFixedTime("Attack", 0.1f);
             
             BulletEntity bullet = PoolManager.Instance.Pool.Get().GetComponent<BulletEntity>();
             shotsCount++;
+            currentBulletCount--;
+            currentBulletCounterTMP.text = "Bullet Capacity: " + currentBulletCount;
             bullet.ownerCharacter = this;
             bullet.transform.position = shootPoint.position;
             bullet.transform.forward = transform.forward;
@@ -236,6 +248,11 @@ namespace _Game.Scripts
 
         private void ShootDown()
         {
+            if (currentBulletCount == 0)
+            {
+                return;
+            }
+            
             attackArea.SetActive(true);
         }
         

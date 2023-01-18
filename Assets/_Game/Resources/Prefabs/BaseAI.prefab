@@ -189,7 +189,8 @@ MonoBehaviour:
   criticTMPPrefab: {fileID: 7431908022035030200, guid: 75f9172262f5d45878bbe79e6fa7987e, type: 3}
   animator: {fileID: 7377784467240916148}
   rb: {fileID: 0}
-  bulletCapacity: 5
+  currentBulletCounterTMP: {fileID: 5269016200105922196}
+  initialBulletCount: 5
   currentBulletCount: 5
   isAlive: 1
   initialHealth: 100
@@ -295,3 +296,14 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2901680028377789697, guid: d6faa58c0fb02436092e7bb45f22a27f, type: 3}
   m_PrefabInstance: {fileID: 1348618525675905000}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5269016200105922196 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6604545578871017852, guid: d6faa58c0fb02436092e7bb45f22a27f, type: 3}
+  m_PrefabInstance: {fileID: 1348618525675905000}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

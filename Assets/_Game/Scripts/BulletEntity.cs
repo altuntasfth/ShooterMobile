@@ -25,10 +25,8 @@ namespace _Game.Scripts
             if (character.isAlive && character.aiType != ownerCharacter.aiType)
             {
                 ownerCharacter.hitShotsCount++;
-
-                damage = ownerCharacter.GetCriticDamage(damage);
                 
-                character.TakeDamage(damage);
+                character.TakeDamage(ownerCharacter.GetCriticDamage(damage));
                 DOTween.Kill("Destroy" + this.GetInstanceID());
                 PoolManager.Instance.Pool.Release(this.gameObject);
             }

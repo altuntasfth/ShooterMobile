@@ -57,6 +57,8 @@ namespace _Game.Scripts.AI.EnemyAI
             {
                 BulletEntity bullet = PoolManager.Instance.Pool.Get().GetComponent<BulletEntity>();
                 character.shotsCount++;
+                character.currentBulletCount--;
+                character.currentBulletCounterTMP.text = "Bullet Capacity: " + character.currentBulletCount;
                 bullet.ownerCharacter = character;
                 bullet.transform.position = character.shootPoint.position;
                 bullet.transform.forward = character.transform.forward;

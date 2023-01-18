@@ -25,8 +25,9 @@ namespace _Game.Scripts
         public GameObject criticTMPPrefab;
         public Animator animator;
         public Rigidbody rb;
-        public int bulletCapacity = 5;
-        public int currentBulletCount = 5;
+        public TextMeshPro currentBulletCounterTMP;
+        public int initialBulletCount = 5;
+        public int currentBulletCount;
         public bool isAlive;
         public float initialHealth = 100;
         public float initialArmor = 100;
@@ -62,6 +63,26 @@ namespace _Game.Scripts
             armorBarFillImage.fillAmount = Mathf.Lerp(armorBarFillImage.fillAmount, armorRatio, Time.smoothDeltaTime * 5f);
         }
 
+        public void ReloadBullet(BulletHolder bulletHolder)
+        {
+            int missingBulletCount = initialBulletCount - currentBulletCount;
+            int reloadableBulletCount = 0;
+
+            if (bulletHolder.currentBulletCount >= missingBulletCount)
+            {
+                bulletHolder.currentBulletCount -= missingBulletCount;
+                reloadableBulletCount = missingBulletCount;
+            }
+            else
+            {
+                reloadableBulletCount = bulletHolder.currentBulletCount;
+                bulletHolder.currentBulletCount = 0;
+            }
+            
+            currentBulletCount = reloadableBulletCount;
+            currentBulletCounterTMP.text = "Bullet Capacity: " + currentBulletCount;
+        }
+
         public float GetCriticDamage(float damageValue)
         {
             if (hitShotsCount != shotsCount)
@@ -78,8 +99,13 @@ namespace _Game.Scripts
                         GetComponent<TextMeshPro>();
                     criticTMP.text = "CRITIC!";
                     Destroy(criticTMP.gameObject, 2f);
+                    
+                    shotsCount = 0;
+                    hitShotsCount = 0;
                 }
             }
+            
+            Debug.Log(hitShotsCount + " " + shotsCount + " " + damageValue, this);
 
             return damageValue;
         }

@@ -22,7 +22,10 @@ namespace _Game.Scripts
 
             currentHealth = initialHealth;
             currentArmor = initialArmor;
+            currentBulletCount = initialBulletCount;
             
+            currentBulletCounterTMP.text = "Bullet Capacity: " + currentBulletCount;
+
             SetupStateMachine();
         }
 
