@@ -52,7 +52,9 @@ namespace _Game.Scripts
             gameManager.cameraTarget.localPosition = Vector3.zero;
 
             currentHealth = playerSettings.initialHealth;
+            initialHealth = playerSettings.initialHealth;
             currentArmor = playerSettings.initialArmor;
+            initialArmor = playerSettings.initialArmor;
             currentBulletCount = initialBulletCount;
             currentBulletCounterTMP.text = "Bullet Capacity: " + currentBulletCount;
         }

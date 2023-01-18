@@ -80,7 +80,7 @@ namespace _Game.Scripts
                 bulletHolder.currentBulletCount = 0;
             }
             
-            currentBulletCount = reloadableBulletCount;
+            currentBulletCount += reloadableBulletCount;
             currentBulletCounterTMP.text = "Bullet Capacity: " + currentBulletCount;
         }
 

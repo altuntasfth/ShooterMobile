@@ -22,13 +22,16 @@ namespace _Game.Scripts
         private void OnTriggerEnter(Collider other)
         {
             BaseCharacter character = other.gameObject.GetComponent<BaseCharacter>();
-            if (character.isAlive && character.aiType != ownerCharacter.aiType)
+            if (character)
             {
-                ownerCharacter.hitShotsCount++;
+                if (character.isAlive && character.aiType != ownerCharacter.aiType)
+                {
+                    ownerCharacter.hitShotsCount++;
                 
-                character.TakeDamage(ownerCharacter.GetCriticDamage(damage));
-                DOTween.Kill("Destroy" + this.GetInstanceID());
-                PoolManager.Instance.Pool.Release(this.gameObject);
+                    character.TakeDamage(ownerCharacter.GetCriticDamage(damage));
+                    DOTween.Kill("Destroy" + this.GetInstanceID());
+                    PoolManager.Instance.Pool.Release(this.gameObject);
+                }
             }
         }
     }
