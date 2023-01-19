@@ -1,12 +1,5 @@
 {
   "dependencies": {
-    "com.inspiaaa.unityhfsm": {
-      "version": "git@github.com:Inspiaaa/UnityHFSM.git",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "a72ec7c22309bcc6a5cbeac7fbc405fb87ad1159"
-    },
     "com.unity.addressables": {
       "version": "1.19.19",
       "depth": 0,
